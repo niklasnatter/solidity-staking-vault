@@ -1,18 +1,28 @@
 import { ethers } from 'hardhat';
 
 const main = async () => {
-    const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+    const network = await     ethers.provider.getNetwork();
+    console.log(`----- Starting contract deployments to chain with id ${network.chainId} ------`);
 
-    const lockedAmount = ethers.utils.parseEther('1');
+    const vaultFactory = await ethers.getContractFactory('Vault');
+    const vault = await vaultFactory.deploy();
+    await vault.deployed();
+    console.log(`Successfully deployed "Vault" contract: ${vault.address}`);
 
-    const Lock = await ethers.getContractFactory('Lock');
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    const devUSDCFactory = await ethers.getContractFactory('DevUSDC');
+    const devUSDC = await devUSDCFactory.deploy();
+    await devUSDC.deployed();
+    console.log(`Successfully deployed "DevUSDC" contract: ${devUSDC.address}`);
 
-    await lock.deployed();
+    const setRewardTx = await vault.setRewardToken(devUSDC.address);
+    await setRewardTx.wait();
+    console.log(`Successfully set reward token to "Vault" contract`);
 
-    console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+    const setVaultTx = await devUSDC.setVault(vault.address);
+    await setVaultTx.wait();
+    console.log(`Successfully set vault address to "DevUSDC" contract`);
+
+    console.log(`----- Contract deployments finished ------`);
 };
 
 // We recommend this pattern to be able to use async/await everywhere

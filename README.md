@@ -40,13 +40,18 @@ npx hardhat test
 
 ### Deploy contracts
 
+Make sure to set the `GOERLI_PRIVATE_KEY` variable in the `.env.local` file before executing any commands.
+
 ```bash
-npx hardhat run scripts/deploy.ts
+npx hardhat run --network goerli scripts/deploy.ts
 ```
 
 ### Verify contracts
 
+Make sure to set the `ETHERSCAN_API_KEY` variable in the `.env.local` file before executing any commands.
+
 ```bash
-# replace <address> and <unlock time> with values logged by deploy script
-npx hardhat verify --network goerli <address> <unlock time>
+# replace <vault-address> and <devusdc-address> with the addresses logged by deploy script
+npx hardhat verify --network goerli <vault-address>
+npx hardhat verify --network goerli <devusdc-address>
 ```
