@@ -24,6 +24,11 @@ cp .env .env.local
 vim .env.local
 ```
 
+### Lint code
+```bash
+npm run lint
+```
+
 ### Execute test cases
 ```bash
 npx hardhat test
