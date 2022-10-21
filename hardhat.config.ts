@@ -11,12 +11,12 @@ const config: HardhatUserConfig = {
     networks: {
         goerli: {
             url: process.env.GOERLI_RPC_URL,
-            accounts: [`0x${process.env.GOERLI_PRIVATE_KEY}`]
+            accounts: [`0x${process.env.GOERLI_PRIVATE_KEY || ''}`],
         },
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY
-    }
+        apiKey: process.env.ETHERSCAN_API_KEY,
+    },
 };
 
 export default config;

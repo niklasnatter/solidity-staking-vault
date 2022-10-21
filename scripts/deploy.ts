@@ -1,11 +1,20 @@
 import { ethers } from 'hardhat';
 
+const ethUsdPriceFeedAddresses: { [chainId: number]: string | undefined } = {
+    5: '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e', // goerli
+};
+
 const main = async () => {
-    const network = await     ethers.provider.getNetwork();
+    const network = await ethers.provider.getNetwork();
     console.log(`----- Starting contract deployments to chain with id ${network.chainId} ------`);
 
+    const ethUsdPriceFeedAddress = ethUsdPriceFeedAddresses[network.chainId];
+    if (!ethUsdPriceFeedAddress) {
+        throw new Error(`Missing ETH/USD price feed address for chain with id ${network.chainId}`);
+    }
+
     const vaultFactory = await ethers.getContractFactory('Vault');
-    const vault = await vaultFactory.deploy();
+    const vault = await vaultFactory.deploy(ethUsdPriceFeedAddress);
     await vault.deployed();
     console.log(`Successfully deployed "Vault" contract: ${vault.address}`);
 

@@ -2,13 +2,15 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./interfaces/IVaultRewardToken.sol";
 
 contract Vault is Ownable {
     uint256 public constant STAKING_APY = 0.1e18;
     uint256 public constant MINIMUM_STAKING_AMOUNT = 5 ether;
-    address public rewardToken;
+    IVaultRewardToken public rewardToken;
 
+    AggregatorV3Interface private _ethUsdPriceFeed;
     mapping(address => uint256) private _stakedBalances;
     mapping(address => uint256) private _lastCheckmark;
     mapping(address => uint256) private _checkmarkedEtherReward;
@@ -16,7 +18,11 @@ contract Vault is Ownable {
     event Deposit(address owner, uint256 amount);
     event Withdrawal(address owner, uint256 amount, uint256 rewardAmount);
 
-    function setRewardToken(address rewardToken_) public onlyOwner {
+    constructor(AggregatorV3Interface ethUsdPriceFeed) {
+        _ethUsdPriceFeed = ethUsdPriceFeed;
+    }
+
+    function setRewardToken(IVaultRewardToken rewardToken_) public onlyOwner {
         rewardToken = rewardToken_;
     }
 
@@ -38,7 +44,7 @@ contract Vault is Ownable {
         _stakedBalances[msg.sender] -= amount;
 
         uint256 totalRewardAmount = _rewardTokenAmount(totalEtherReward);
-        IVaultRewardToken(rewardToken).mint(msg.sender, totalRewardAmount);
+        rewardToken.mint(msg.sender, totalRewardAmount);
         payable(msg.sender).transfer(amount);
         emit Withdrawal(msg.sender, amount, totalRewardAmount);
 
@@ -71,13 +77,16 @@ contract Vault is Ownable {
     }
 
     function _rewardTokenAmount(uint256 etherAmount) internal view returns (uint256) {
-        return etherAmount / 10;
+        (, int256 etherPrice, , , ) = _ethUsdPriceFeed.latestRoundData();
+        uint256 denominator = 10**_ethUsdPriceFeed.decimals();
+
+        return (etherAmount * uint256(etherPrice)) / denominator;
     }
 
     function _assertMinimumStakingAmount(address owner) internal view {
         require(
             _stakedBalances[owner] == 0 || _stakedBalances[owner] >= MINIMUM_STAKING_AMOUNT,
-            "Account below minimum amount"
+            "Below minimum staking amount"
         );
     }
 }

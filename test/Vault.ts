@@ -6,8 +6,11 @@ describe('Vault', () => {
     const deployVaultAndDevUSDC = async () => {
         const [owner, account1, account2] = await ethers.getSigners();
 
+        const priceFeedFactory = await ethers.getContractFactory('MockV3Aggregator');
+        const priceFeed = await priceFeedFactory.deploy(8, 100 * 1e8); // mock eth price to 100 usd
+
         const vaultFactory = await ethers.getContractFactory('Vault');
-        const vault = await vaultFactory.deploy();
+        const vault = await vaultFactory.deploy(priceFeed.address);
 
         const devUSDCFactory = await ethers.getContractFactory('DevUSDC');
         const devUSDC = await devUSDCFactory.deploy();
@@ -38,6 +41,7 @@ describe('Vault', () => {
 
     describe('Deposit', () => {
         const depositAmount = ethers.utils.parseEther('10');
+        const yearlyRewardAmount = depositAmount.div(10).mul(100); // 10% apy * 100$ eth price
         const oneYearInSeconds = 365 * 24 * 60 * 60;
 
         it('Should return correct balances after deposit', async () => {
@@ -55,7 +59,7 @@ describe('Vault', () => {
             await time.increase(oneYearInSeconds);
 
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount);
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount);
         });
 
         it('Should return correct balances after two successive deposits', async () => {
@@ -69,7 +73,7 @@ describe('Vault', () => {
             await time.increase(oneYearInSeconds);
 
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount.mul(2));
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.mul(3).div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount.mul(3));
         });
 
         it('Should emit correct event', async () => {
@@ -84,7 +88,7 @@ describe('Vault', () => {
             const { vault, account1 } = await loadFixture(deployVaultAndDevUSDC);
 
             await expect(vault.connect(account1).deposit({ value: ethers.utils.parseEther('1') })).to.be.revertedWith(
-                'Account below minimum staking amount'
+                'Below minimum staking amount'
             );
         });
     });
@@ -93,6 +97,7 @@ describe('Vault', () => {
         const oneEther = ethers.utils.parseEther('1');
         const depositAmount = ethers.utils.parseEther('10');
         const withdrawAmount = ethers.utils.parseEther('3');
+        const yearlyRewardAmount = depositAmount.div(10).mul(100); // 10% apy * 100$ eth price
         const oneYearInSeconds = 365 * 24 * 60 * 60;
 
         it('Should return correct balances after partial withdraw', async () => {
@@ -134,7 +139,7 @@ describe('Vault', () => {
             const withdrawalCost = result.gasUsed.mul(result.effectiveGasPrice);
 
             expect(await account1.getBalance()).to.equal(oneEther.add(withdrawAmount).sub(withdrawalCost));
-            expect(await devUSDC.balanceOf(account1.address)).to.equal(depositAmount.div(100));
+            expect(await devUSDC.balanceOf(account1.address)).to.equal(yearlyRewardAmount);
         });
 
         it('Should emit correct event', async () => {
@@ -146,7 +151,7 @@ describe('Vault', () => {
 
             await expect(vault.connect(account1).withdraw(withdrawAmount))
                 .to.emit(vault, 'Withdrawal')
-                .withArgs(account1.address, withdrawAmount, depositAmount.div(100));
+                .withArgs(account1.address, withdrawAmount, yearlyRewardAmount);
         });
 
         it('Should reject withdrawal that that exceeds account balance', async () => {
@@ -167,7 +172,7 @@ describe('Vault', () => {
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount);
 
             await expect(vault.connect(account1).withdraw(depositAmount.sub(1))).to.be.revertedWith(
-                'Account below minimum staking amount'
+                'Below minimum staking amount'
             );
         });
     });
@@ -175,6 +180,7 @@ describe('Vault', () => {
     describe('Deposit and Withdraw', () => {
         const depositAmount = ethers.utils.parseEther('10');
         const oneYearInSeconds = 365 * 24 * 60 * 60;
+        const yearlyRewardAmount = depositAmount.div(10).mul(100); // 10% apy * 100$ eth price
 
         it('Should return correct balances for simultaneously active users', async () => {
             const { vault, account1, account2 } = await loadFixture(deployVaultAndDevUSDC);
@@ -196,28 +202,28 @@ describe('Vault', () => {
             await vault.connect(account2).deposit({ value: depositAmount.mul(2) });
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount);
             expect(await vault.stakedBalance(account2.address)).to.equal(depositAmount.mul(2));
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.mul(1).div(100));
-            expect(await vault.earnedRewardAmount(account2.address)).to.equal(depositAmount.mul(0).div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount);
+            expect(await vault.earnedRewardAmount(account2.address)).to.equal(0);
 
             await time.increase(oneYearInSeconds - 1);
             await vault.connect(account2).withdraw(depositAmount);
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount);
             expect(await vault.stakedBalance(account2.address)).to.equal(depositAmount);
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.mul(2).div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount.mul(2));
             expect(await vault.earnedRewardAmount(account2.address)).to.equal(0);
 
             await time.increase(oneYearInSeconds - 1);
             await vault.connect(account1).deposit({ value: depositAmount });
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount.mul(2));
             expect(await vault.stakedBalance(account2.address)).to.equal(depositAmount);
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.mul(3).div(100));
-            expect(await vault.earnedRewardAmount(account2.address)).to.equal(depositAmount.div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount.mul(3));
+            expect(await vault.earnedRewardAmount(account2.address)).to.equal(yearlyRewardAmount);
 
             await time.increase(oneYearInSeconds - 1);
             await vault.connect(account2).withdraw(depositAmount);
             expect(await vault.stakedBalance(account1.address)).to.equal(depositAmount.mul(2));
             expect(await vault.stakedBalance(account2.address)).to.equal(0);
-            expect(await vault.earnedRewardAmount(account1.address)).to.equal(depositAmount.mul(5).div(100));
+            expect(await vault.earnedRewardAmount(account1.address)).to.equal(yearlyRewardAmount.mul(5));
             expect(await vault.earnedRewardAmount(account2.address)).to.equal(0);
         });
     });

@@ -31,6 +31,7 @@
         "solhint-plugin-prettier": "^0.0.5"
     },
     "dependencies": {
+        "@chainlink/contracts": "^0.5.1",
         "@openzeppelin/contracts": "^4.7.3",
         "dotenv": "^16.0.3"
     }
