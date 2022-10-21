@@ -8,8 +8,8 @@ import "./interfaces/IVaultRewardToken.sol";
 contract DevUSDC is IVaultRewardToken, ERC20, Ownable {
     address private _vault;
 
-    constructor() ERC20("devUSDC", "dUSDC") {
-    }
+    // solhint-disable-next-line no-empty-blocks
+    constructor() ERC20("devUSDC", "dUSDC") {}
 
     function setVault(address vault) public onlyOwner {
         _vault = vault;

@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IVaultRewardToken.sol";
 
 contract Vault is Ownable {
-    uint256 public constant stakingApy = 0.1e18;
-    uint256 public constant minimumStakingAmount = 5 ether;
+    uint256 public constant STAKING_APY = 0.1e18;
+    uint256 public constant MINIMUM_STAKING_AMOUNT = 5 ether;
     address public rewardToken;
 
     mapping(address => uint256) private _stakedBalances;
@@ -55,8 +55,8 @@ contract Vault is Ownable {
         return _rewardTokenAmount(totalEtherReward);
     }
 
-    function _pendingEtherReward(address owner) internal view returns (uint256)  {
-        uint256 etherRewardPerYear = (_stakedBalances[owner] * stakingApy) / 1e18;
+    function _pendingEtherReward(address owner) internal view returns (uint256) {
+        uint256 etherRewardPerYear = (_stakedBalances[owner] * STAKING_APY) / 1e18;
         uint256 secondsSinceCheckmark = block.timestamp - _lastCheckmark[owner];
 
         return (etherRewardPerYear * secondsSinceCheckmark) / 365 days;
@@ -74,7 +74,10 @@ contract Vault is Ownable {
         return etherAmount / 10;
     }
 
-    function _assertMinimumStakingAmount(address owner) view internal {
-        require(_stakedBalances[owner] == 0 || _stakedBalances[owner] >= minimumStakingAmount, "Account below minimum staking amount");
+    function _assertMinimumStakingAmount(address owner) internal view {
+        require(
+            _stakedBalances[owner] == 0 || _stakedBalances[owner] >= MINIMUM_STAKING_AMOUNT,
+            "Account below minimum amount"
+        );
     }
 }
