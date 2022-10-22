@@ -19,13 +19,6 @@
 npm install
 ```
 
-### Configure environment variables in .env.local file
-
-```
-cp .env .env.local
-vim .env.local
-```
-
 ### Lint code
 
 ```bash
@@ -36,6 +29,13 @@ npm run lint
 
 ```bash
 npx hardhat test
+```
+
+### Configure environment variables in .env.local file
+
+```
+cp .env .env.local
+vim .env.local
 ```
 
 ### Deploy contracts
@@ -51,7 +51,7 @@ npx hardhat run --network goerli scripts/deploy.ts
 Make sure to set the `ETHERSCAN_API_KEY` variable in the `.env.local` file before executing any commands.
 
 ```bash
-# replace <vault-address> and <devusdc-address> with the addresses logged by deploy script
-npx hardhat verify --network goerli <vault-address>
+# replace placeholders with the values logged by deploy script
 npx hardhat verify --network goerli <devusdc-address>
+npx hardhat verify --network goerli <vault-address> <devusdc-address> <price-feed-address> <compound-ether-address>
 ```
