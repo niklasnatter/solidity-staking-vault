@@ -13,6 +13,12 @@ const config: HardhatUserConfig = {
             url: process.env.GOERLI_RPC_URL,
             accounts: [`0x${process.env.GOERLI_PRIVATE_KEY || ''}`],
         },
+        hardhat: {
+            forking: {
+                url: process.env.MAINNET_RPC_URL || '',
+                blockNumber: 15804036,
+            },
+        },
     },
     etherscan: {
         apiKey: process.env.ETHERSCAN_API_KEY,
