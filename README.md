@@ -11,6 +11,13 @@
 -   Minimum amount to stake is 5 ETH
 -   To get the price of ETH you will need to use a price oracle from chainlink
 
+## Deployment
+
+| Source      | Deployment                                                                                                                   |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Vault.sol   | [0x62eddd964d63800afdb6fbad0077efaaa32a284a](https://goerli.etherscan.io/address/0x62eddd964d63800afdb6fbad0077efaaa32a284a) |
+| DevUSDC.sol | [0x21c0f5648ab1f0a274958e4c0d6f54b4d3c96080](https://goerli.etherscan.io/address/0x21c0f5648ab1f0a274958e4c0d6f54b4d3c96080) |
+
 ## Development
 
 ### Install dependencies
