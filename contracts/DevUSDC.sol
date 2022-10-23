@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IVaultRewardToken.sol";
 
 contract DevUSDC is IVaultRewardToken, ERC20, Ownable {
+    event ChangedVault(address newVault);
+
     /**
      * @notice Vault contract that is allowed to mint new tokens
      */
@@ -15,11 +17,13 @@ contract DevUSDC is IVaultRewardToken, ERC20, Ownable {
     constructor() ERC20("devUSDC", "dUSDC") {}
 
     /**
-     * @notice Set vault contract that is allowed to mint new tokens
+     * @notice Set vault contract that is allowed to mint new tokens. Can only be called by the owner
      * @param vault The address of the vault contract
      */
     function setVault(address vault) public onlyOwner {
         _vault = vault;
+
+        emit ChangedVault(vault);
     }
 
     /**

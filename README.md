@@ -11,12 +11,12 @@
 -   Minimum amount to stake is 5 ETH
 -   To get the price of ETH you will need to use a price oracle from chainlink
 
-## Deployment
+## Deployments
 
-| Source      | Deployment                                                                                                                   |
+| Source      | Address                                                                                                                      |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Vault.sol   | [0x62eddd964d63800afdb6fbad0077efaaa32a284a](https://goerli.etherscan.io/address/0x62eddd964d63800afdb6fbad0077efaaa32a284a) |
-| DevUSDC.sol | [0x21c0f5648ab1f0a274958e4c0d6f54b4d3c96080](https://goerli.etherscan.io/address/0x21c0f5648ab1f0a274958e4c0d6f54b4d3c96080) |
+| Vault.sol   | [0x714d3F5F2F1529541E306034498492c941B5C370](https://goerli.etherscan.io/address/0x714d3F5F2F1529541E306034498492c941B5C370) |
+| DevUSDC.sol | [0xE592BF7Fe43a5e76BEF7E336cA846bAa57A44241](https://goerli.etherscan.io/address/0xE592BF7Fe43a5e76BEF7E336cA846bAa57A44241) |
 
 ## Development
 
@@ -33,6 +33,8 @@ npm run lint
 ```
 
 ### Execute test cases
+
+Tests are executed in a mainnet fork at block 15804036. Forking mainnet requires an active internet connection.
 
 ```bash
 npx hardhat test

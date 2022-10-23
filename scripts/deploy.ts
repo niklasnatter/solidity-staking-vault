@@ -39,6 +39,7 @@ const main = async () => {
     console.log(`Successfully deployed "Vault" contract: ${vault.address}`);
 
     const setVaultTx = await devUSDC.setVault(vault.address);
+    console.log(`Sent transaction for setting vault address to "DevUSDC" contract: ${vault.deployTransaction.hash}`);
     await setVaultTx.wait();
     console.log(`Successfully set vault address to "DevUSDC" contract`);
 

@@ -24,7 +24,7 @@ contract Vault is Ownable {
      */
     uint256 public constant STAKING_APY = 0.1e18;
     /**
-     * @notice Minimum staking amount of the Vault
+     * @notice Minimum amount of ether that must be staked in the Vault
      */
     uint256 public constant MINIMUM_STAKING_AMOUNT = 5 ether;
     /**
@@ -32,7 +32,7 @@ contract Vault is Ownable {
      */
     IVaultRewardToken public immutable rewardToken;
     /**
-     * @notice Total amount that is staked in the Vault
+     * @notice Total amount of ether that is staked in the Vault
      */
     uint256 public totalStakedBalance = 0;
 
@@ -73,8 +73,8 @@ contract Vault is Ownable {
     }
 
     /**
-     * @notice Withdraw the given amount and all accrued rewards from the Vault. The amount is withdrawn from Compound
-     * and sent to the caller
+     * @notice Withdraw the given ether amount and all accrued reward tokens from the Vault. The ether amount is
+     * withdrawn from Compound and sent to the caller
      * @param amount Amount of ether that is withdrawn from the Vault
      */
     function withdraw(uint256 amount) public {
@@ -96,7 +96,7 @@ contract Vault is Ownable {
     }
 
     /**
-     * @notice Return the total amount tht was staked by the given owner
+     * @notice Return the total amount of ether that was staked by the given owner
      * @param owner Owner of which the staked amount is returned
      * @return The total amount staked by the owner
      */
@@ -190,7 +190,8 @@ contract Vault is Ownable {
     }
 
     /**
-     * @notice Claim the COMP rewards earned by the Vault from the Compount Comptroller and transfer them to the given recipient
+     * @notice Claim the COMP rewards earned by the Vault from the Compound comptroller and transfer them to the
+     * given recipient. Can only be called by the owner
      * @param recipient Address to which the claimed COMP reward is transferred
      */
     function claimCompReward(address recipient) public onlyOwner {
@@ -205,7 +206,9 @@ contract Vault is Ownable {
     }
 
     /**
-     * @notice Skim the interest earned by the ether deposited in Compound and transfer them to the given recipient
+     * @notice Withdraw the interest earned by the ether deposited in Compound and transfer it to the given recipient.
+     * This will only transfer earned interest, all funds belonging to users will be kept in Compound. Can only be
+     * called by the owner
      * @param recipient Address to which the earned interest is transferred
      */
     function skimCompoundInterest(address payable recipient) public onlyOwner {

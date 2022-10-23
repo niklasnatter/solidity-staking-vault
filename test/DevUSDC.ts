@@ -28,7 +28,15 @@ describe('DevUSDC', () => {
     });
 
     describe('Vault', () => {
-        it('Should allow setting vault for owner only', async () => {
+        it('Should emit an event when Vault address is set', async () => {
+            const { devUSDC, owner, vault } = await loadFixture(deployDevUSDC);
+
+            await expect(devUSDC.connect(owner).setVault(vault.address))
+                .to.emit(devUSDC, 'ChangedVault')
+                .withArgs(vault.address);
+        });
+
+        it('Should allow setting the Vault address for owner only', async () => {
             const { devUSDC, owner, vault, otherAccount } = await loadFixture(deployDevUSDC);
 
             await expect(devUSDC.connect(otherAccount).setVault(vault.address)).to.be.revertedWith(
