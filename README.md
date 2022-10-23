@@ -49,7 +49,7 @@ vim .env.local
 
 ### Deploy contracts
 
-Make sure to set the `GOERLI_PRIVATE_KEY` variable in the `.env.local` file before executing any commands.
+Make sure to set an appropriate `GOERLI_PRIVATE_KEY` variable in the `.env.local` file before executing any commands.
 
 ```bash
 npx hardhat run --network goerli scripts/deploy.ts

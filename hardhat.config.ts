@@ -11,7 +11,7 @@ const config: HardhatUserConfig = {
     networks: {
         goerli: {
             url: process.env.GOERLI_RPC_URL,
-            accounts: [`0x${process.env.GOERLI_PRIVATE_KEY || ''}`],
+            accounts: process.env.GOERLI_PRIVATE_KEY ? [`0x${process.env.GOERLI_PRIVATE_KEY}`] : [],
         },
         hardhat: {
             forking: {

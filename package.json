@@ -8,7 +8,7 @@
         "eslint": "eslint --cache --fix .",
         "solhint": "solhint --fix **/*.sol",
         "tsc": "tsc --noEmit",
-        "lint": "npm run eslint && npm run solhint && npm run tsc"
+        "lint": "hardhat typechain && npm run eslint && npm run solhint && npm run tsc"
     },
     "keywords": [],
     "author": "",
